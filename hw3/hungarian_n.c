@@ -1,11 +1,18 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+int **create_G(const int n, const int m);
+void print_G(int **g, const int n, const int m);
+void destroy_G(int **g, const int n);
+int **compute_Guv(const int n, int **w, const int *u, const int *v);
 
 int main()
 {
     int n;
     scanf("%d", &n);
-    int w[n][n];
-    int u[n];
+    int *u = calloc(n, sizeof(int));
+    int *v = calloc(n, sizeof(int));
+    int **w = create_G(n, n);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             scanf("%d", &w[i][j]);
@@ -18,18 +25,52 @@ int main()
             }
         }
     }
+    int **Guv = compute_Guv(n, w, u, v);
+    print_G(Guv, n, n);
 
+    destroy_G(Guv, n);
+    destroy_G(w, n);
+    free(v);
+    free(u);
+    return 0;
+}
+
+int **create_G(const int n, const int m)
+{
+    int **ret = (int **)calloc(n, sizeof(int *));
     for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            printf("%d ", w[i][j]);
+        ret[i] = calloc(m, sizeof(int));
+    }
+    return ret;
+}
+
+void print_G(int **g, const int n, const int m)
+{
+    printf("\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            printf("%d ", g[i][j]);
         }
         printf("\n");
     }
     printf("\n");
-    for (int i = 0; i < n; i++) {
-        printf("%d ", u[i]);
-    }
-    printf("\n");
+}
 
-    return 0;
+void destroy_G(int **g, const int n)
+{
+    for (int i = 0; i < n; i++) {
+        free(g[i]);
+    }
+    free(g);
+}
+
+int **compute_Guv(const int n, int **w, const int *u, const int *v)
+{
+    int **ret = create_G(n, n);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            ret[i][j] = u[i] + v[j] - w[i][j];
+        }
+    }
+    return ret;
 }
