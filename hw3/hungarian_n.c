@@ -11,6 +11,8 @@ int **get_Guv(int **w, const int n, const int m);
 bool dfs(int **guv, const int i, const int m, bool *vis, int *set_T);
 int *min_vertex_cover(int **guv, const int n, const int m);
 bool is_perfect_matching(const int *set_T, const int m);
+int compute_epsilon(int **w, const int n, const int m, const int *set_T);
+void adjust_u_v(int *u, int *v, const int n, const int m, const int *set_T, const int epsilon);
 
 int main()
 {
@@ -42,9 +44,30 @@ int main()
 
     int *set_T = min_vertex_cover(Guv, n, m);
     for (int i = 0; i < m; i++) {
-        printf("%d ", set_T[i]);
+        // printf("%d ", set_T[i]);
     }
     printf("%d\n", is_perfect_matching(set_T, m));
+    int epsilon = compute_epsilon(new_w, n, m, set_T);
+    for (int i = 0; i < n; i++) {
+        printf("%d ", u[i]);
+    }
+    printf("\n");
+    for (int i = 0; i < m; i++) {
+        printf("%d ", v[i]);
+    }
+    printf("\n");
+
+    adjust_u_v(u, v, n, m, set_T, epsilon);
+
+    for (int i = 0; i < n; i++) {
+        printf("%d ", u[i]);
+    }
+    printf("\n");
+    for (int i = 0; i < m; i++) {
+        printf("%d ", v[i]);
+    }
+    printf("\n");
+
 
     free(set_T);
     destroy_G(Guv, n);
@@ -146,4 +169,30 @@ bool is_perfect_matching(const int *set_T, const int m)
         }
     }
     return matching == m;
+}
+
+int compute_epsilon(int **w, const int n, const int m, const int *set_T)
+{
+    int epsilon = 2e9;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (set_T[j] != -1) {
+                continue;
+            }
+            epsilon = epsilon < w[i][j] ? epsilon : w[i][j];
+        }
+    }
+    return epsilon;
+}
+
+void adjust_u_v(int *u, int *v, const int n, const int m, const int *set_T, const int epsilon)
+{
+    for (int i = 0; i < n; i++) {
+        u[i] -= epsilon;
+    }
+    for (int i = 0; i < m; i++) {
+        if (set_T[i] != -1) {
+            v[i] += epsilon;
+        }
+    }
 }
