@@ -4,7 +4,7 @@
 int **create_G(const int n, const int m);
 void print_G(int **g, const int n, const int m);
 void destroy_G(int **g, const int n);
-int **compute_Guv(const int n, const int m, int **w, const int *u, const int *v);
+int **compute_new_w(const int n, const int m, int **w, const int *u, const int *v);
 
 int main()
 {
@@ -26,10 +26,10 @@ int main()
             }
         }
     }
-    int **Guv = compute_Guv(n, m, w, u, v);
-    print_G(Guv, n, n);
+    int **new_w = compute_new_w(n, m, w, u, v);
+    print_G(new_w, n, n);
 
-    destroy_G(Guv, n);
+    destroy_G(new_w, n);
     destroy_G(w, n);
     free(v);
     free(u);
@@ -65,7 +65,7 @@ void destroy_G(int **g, const int n)
     free(g);
 }
 
-int **compute_Guv(const int n, const int m, int **w, const int *u, const int *v)
+int **compute_new_w(const int n, const int m, int **w, const int *u, const int *v)
 {
     int **ret = create_G(n, m);
     for (int i = 0; i < n; i++) {
