@@ -18,6 +18,7 @@ int main()
 {
     int n, m;
     scanf("%d", &n);
+    // scanf("%d", &m);
     m = n;
     int *u = calloc(n, sizeof(int));
     int *v = calloc(m, sizeof(int));
@@ -34,45 +35,41 @@ int main()
             }
         }
     }
-    print_G(w, n, m);
+    // print_G(w, n, m);
 
-    int **new_w = compute_new_w(n, m, w, u, v);
-    print_G(new_w, n, m);
+    bool is_perfect = 0;
+    int *ans_T = calloc(m, sizeof(int));
+    do {
+        int **new_w = compute_new_w(n, m, w, u, v);
+        // print_G(new_w, n, m);
 
-    int **Guv = get_Guv(new_w, n, m);
-    print_G(Guv, n, m);
+        int **Guv = get_Guv(new_w, n, m);
 
-    int *set_T = min_vertex_cover(Guv, n, m);
+        int *set_T = min_vertex_cover(Guv, n, m);
+        is_perfect = is_perfect_matching(set_T, m);
+        if (is_perfect) {
+            for (int i = 0; i < m; i++) {
+                ans_T[i] = set_T[i];
+            }
+        }
+
+        int epsilon = compute_epsilon(new_w, n, m, set_T);
+        adjust_u_v(u, v, n, m, set_T, epsilon);
+
+        free(set_T);
+        destroy_G(Guv, n);
+        destroy_G(new_w, n);
+    } while (!is_perfect);
+
+
+    int max_w = 0;
     for (int i = 0; i < m; i++) {
-        // printf("%d ", set_T[i]);
+        max_w += w[ans_T[i]][i];
     }
-    printf("%d\n", is_perfect_matching(set_T, m));
-    int epsilon = compute_epsilon(new_w, n, m, set_T);
-    for (int i = 0; i < n; i++) {
-        printf("%d ", u[i]);
-    }
-    printf("\n");
-    for (int i = 0; i < m; i++) {
-        printf("%d ", v[i]);
-    }
-    printf("\n");
+    printf("%d", max_w);
 
-    adjust_u_v(u, v, n, m, set_T, epsilon);
-
-    for (int i = 0; i < n; i++) {
-        printf("%d ", u[i]);
-    }
-    printf("\n");
-    for (int i = 0; i < m; i++) {
-        printf("%d ", v[i]);
-    }
-    printf("\n");
-
-
-    free(set_T);
-    destroy_G(Guv, n);
-    destroy_G(new_w, n);
     destroy_G(w, n);
+    free(ans_T);
     free(v);
     free(u);
     return 0;
