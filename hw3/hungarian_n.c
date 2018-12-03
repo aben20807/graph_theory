@@ -10,6 +10,7 @@ int **compute_new_w(const int n, const int m, int **w, const int *u, const int *
 int **get_Guv(int **w, const int n, const int m);
 bool dfs(int **guv, const int i, const int m, bool *vis, int *set_T);
 int *min_vertex_cover(int **guv, const int n, const int m);
+bool is_perfect_matching(const int *set_T, const int m);
 
 int main()
 {
@@ -43,7 +44,7 @@ int main()
     for (int i = 0; i < m; i++) {
         printf("%d ", set_T[i]);
     }
-    printf("\n");
+    printf("%d\n", is_perfect_matching(set_T, m));
 
     free(set_T);
     destroy_G(Guv, n);
@@ -134,4 +135,15 @@ int *min_vertex_cover(int **guv, const int n, const int m)
         }
     }
     return set_T;
+}
+
+bool is_perfect_matching(const int *set_T, const int m)
+{
+    int matching = 0;
+    for (int i = 0; i < m; i++) {
+        if (set_T[i] != -1) {
+            matching++;
+        }
+    }
+    return matching == m;
 }
