@@ -4,14 +4,15 @@
 int **create_G(const int n, const int m);
 void print_G(int **g, const int n, const int m);
 void destroy_G(int **g, const int n);
-int **compute_Guv(const int n, int **w, const int *u, const int *v);
+int **compute_Guv(const int n, const int m, int **w, const int *u, const int *v);
 
 int main()
 {
-    int n;
+    int n, m;
     scanf("%d", &n);
+    m = n;
     int *u = calloc(n, sizeof(int));
-    int *v = calloc(n, sizeof(int));
+    int *v = calloc(m, sizeof(int));
     int **w = create_G(n, n);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -25,7 +26,7 @@ int main()
             }
         }
     }
-    int **Guv = compute_Guv(n, w, u, v);
+    int **Guv = compute_Guv(n, m, w, u, v);
     print_G(Guv, n, n);
 
     destroy_G(Guv, n);
@@ -64,11 +65,11 @@ void destroy_G(int **g, const int n)
     free(g);
 }
 
-int **compute_Guv(const int n, int **w, const int *u, const int *v)
+int **compute_Guv(const int n, const int m, int **w, const int *u, const int *v)
 {
-    int **ret = create_G(n, n);
+    int **ret = create_G(n, m);
     for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+        for (int j = 0; j < m; j++) {
             ret[i][j] = u[i] + v[j] - w[i][j];
         }
     }
