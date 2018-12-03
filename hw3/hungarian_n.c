@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 
 int **create_G(const int n, const int m);
 void print_G(int **g, const int n, const int m);
 void destroy_G(int **g, const int n);
 int **compute_new_w(const int n, const int m, int **w, const int *u, const int *v);
 int **get_Guv(int **w, const int n, const int m);
+bool dfs(int **guv, const int i, const int m, bool *vis, int *set_T);
+int *min_vertex_cover(int **guv, const int n, const int m);
 
 int main()
 {
@@ -27,12 +31,21 @@ int main()
             }
         }
     }
+    print_G(w, n, m);
+
     int **new_w = compute_new_w(n, m, w, u, v);
     print_G(new_w, n, m);
 
     int **Guv = get_Guv(new_w, n, m);
     print_G(Guv, n, m);
 
+    int *set_T = min_vertex_cover(Guv, n, m);
+    for (int i = 0; i < m; i++) {
+        printf("%d ", set_T[i]);
+    }
+    printf("\n");
+
+    free(set_T);
     destroy_G(Guv, n);
     destroy_G(new_w, n);
     destroy_G(w, n);
@@ -90,4 +103,35 @@ int **get_Guv(int **w, const int n, const int m)
         }
     }
     return ret;
+}
+
+bool dfs(int **guv, const int i, const int m, bool *vis, int *set_T)
+{
+    for (int j = 0; j < m; j++) {
+        if (guv[i][j] && !vis[j]) {
+            vis[j] = true;
+            if (set_T[j] == -1 || dfs(guv, set_T[j], m, vis, set_T)) {
+                set_T[j] = i;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+int *min_vertex_cover(int **guv, const int n, const int m)
+{
+    int *set_T = calloc(m, sizeof(int));
+    for (int i = 0; i < m; i++) {
+        set_T[i] = -1;
+    }
+    int result = 0;
+    for (int i = 0; i < n; i++) {
+        bool vis[m];
+        memset(vis, 0, sizeof(vis));
+        if (dfs(guv, i, m, vis, set_T)) {
+            result++;
+        }
+    }
+    return set_T;
 }
