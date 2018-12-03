@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <string.h>
 #include <limits.h>
 
 int **create_G(const int n, const int m);
@@ -46,7 +45,6 @@ int main()
             w[i][j] += (w[i][j] == INT_MIN ? min[i] : 0);
         }
     }
-    // print_G(w, n, m);
 
     bool is_perfect = false;
     int *ans_T = calloc(m, sizeof(int));
@@ -55,15 +53,8 @@ int main()
     }
     do {
         int **new_w = compute_new_w(n, m, w, u, v);
-        // print_G(new_w, n, m);
-
         int **Guv = get_Guv(new_w, n, m);
-
         int *set_T = min_vertex_cover(Guv, n, m);
-        // for (int i = 0; i < m; i++) {
-        //     printf("%d ", set_T[i]);
-        // }
-        // printf("\n");
 
         is_perfect = is_perfect_matching(set_T, n, m);
         if (is_perfect) {
@@ -83,7 +74,6 @@ int main()
 
     int max_w = 0;
     for (int i = 0; i < m; i++) {
-        // printf("%d ", ans_T[i]);
         if (ans_T[i] != -1 && w[ans_T[i]][i] >= 0) {
             max_w += w[ans_T[i]][i];
         }
@@ -176,7 +166,9 @@ int *min_vertex_cover(int **guv, const int n, const int m)
     int result = 0;
     for (int i = 0; i < n; i++) {
         bool vis[m];
-        memset(vis, 0, sizeof(vis));
+        for (int j = 0; j < m; j++) {
+            vis[j] = false;
+        }
         if (dfs(guv, i, m, vis, set_T)) {
             result++;
         }
@@ -192,7 +184,6 @@ bool is_perfect_matching(const int *set_T, const int n, const int m)
             matching++;
         }
     }
-    // return matching == ((m > n) ? n : m);
     return matching == m;
 }
 
