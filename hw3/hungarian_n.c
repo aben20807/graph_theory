@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <limits.h>
 
 int **create_G(const int n, const int m);
 void print_G(int **g, const int n, const int m);
@@ -10,7 +11,7 @@ int **compute_new_w(const int n, const int m, int **w, const int *u, const int *
 int **get_Guv(int **w, const int n, const int m);
 bool dfs(int **guv, const int i, const int m, bool *vis, int *set_T);
 int *min_vertex_cover(int **guv, const int n, const int m);
-bool is_perfect_matching(const int *set_T, const int m);
+bool is_perfect_matching(const int *set_T, const int n, const int m);
 int compute_epsilon(int **w, const int n, const int m, const int *set_T);
 void adjust_u_v(int *u, int *v, const int n, const int m, const int *set_T, const int epsilon);
 
@@ -18,27 +19,40 @@ int main()
 {
     int n, m;
     scanf("%d", &n);
-    // scanf("%d", &m);
-    m = n;
+    scanf("%d", &m);
+    // m = n;
+    int sq_size = (n > m ? n : m);
     int *u = calloc(n, sizeof(int));
+    int *min = calloc(n, sizeof(int));
     int *v = calloc(m, sizeof(int));
-    int **w = create_G(n, m);
+    int **w = create_G(sq_size, sq_size);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
             scanf("%d", &w[i][j]);
-
             // u_i = max_j w_ij
             if (!j) {
                 u[i] = w[i][j];
+                min[i] = w[i][j];
             } else {
                 u[i] = u[i] > w[i][j] ? u[i] : w[i][j];
+                min[i] = min[i] < w[i][j] ? min[i] : w[i][j];
             }
+        }
+    }
+    n = sq_size;
+    m = sq_size;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            w[i][j] += (w[i][j] == INT_MIN ? min[i] : 0);
         }
     }
     // print_G(w, n, m);
 
-    bool is_perfect = 0;
+    bool is_perfect = false;
     int *ans_T = calloc(m, sizeof(int));
+    for (int i = 0; i < m; i++) {
+        ans_T[i] = -1;
+    }
     do {
         int **new_w = compute_new_w(n, m, w, u, v);
         // print_G(new_w, n, m);
@@ -46,7 +60,12 @@ int main()
         int **Guv = get_Guv(new_w, n, m);
 
         int *set_T = min_vertex_cover(Guv, n, m);
-        is_perfect = is_perfect_matching(set_T, m);
+        // for (int i = 0; i < m; i++) {
+        //     printf("%d ", set_T[i]);
+        // }
+        // printf("\n");
+
+        is_perfect = is_perfect_matching(set_T, n, m);
         if (is_perfect) {
             for (int i = 0; i < m; i++) {
                 ans_T[i] = set_T[i];
@@ -64,7 +83,10 @@ int main()
 
     int max_w = 0;
     for (int i = 0; i < m; i++) {
-        max_w += w[ans_T[i]][i];
+        // printf("%d ", ans_T[i]);
+        if (ans_T[i] != -1 && w[ans_T[i]][i] >= 0) {
+            max_w += w[ans_T[i]][i];
+        }
     }
     printf("%d", max_w);
 
@@ -80,6 +102,11 @@ int **create_G(const int n, const int m)
     int **ret = (int **)calloc(n, sizeof(int *));
     for (int i = 0; i < n; i++) {
         ret[i] = calloc(m, sizeof(int));
+    }
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            ret[i][j] = INT_MIN;
+        }
     }
     return ret;
 }
@@ -157,7 +184,7 @@ int *min_vertex_cover(int **guv, const int n, const int m)
     return set_T;
 }
 
-bool is_perfect_matching(const int *set_T, const int m)
+bool is_perfect_matching(const int *set_T, const int n, const int m)
 {
     int matching = 0;
     for (int i = 0; i < m; i++) {
@@ -165,12 +192,13 @@ bool is_perfect_matching(const int *set_T, const int m)
             matching++;
         }
     }
+    // return matching == ((m > n) ? n : m);
     return matching == m;
 }
 
 int compute_epsilon(int **w, const int n, const int m, const int *set_T)
 {
-    int epsilon = 2e9;
+    int epsilon = INT_MAX;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
             if (set_T[j] != -1) {
