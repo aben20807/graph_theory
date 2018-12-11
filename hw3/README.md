@@ -3,6 +3,16 @@
 ## Description
 + implement Hungarian algorithm
 
+## Usage
+```bash
+$ gcc hungarian_n_imp.c
+$ ./a.out < test1.in
+```
+```bash
+$ gcc hungarian_n_m.c
+$ ./a.out < test2.in
+```
+
 ## Input
 + 2 ≦ n,m ≦ 10000, n, m are integers.
 + weights are all non-negative integers, smaller than 10^16 (long long).
